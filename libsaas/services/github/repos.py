@@ -2,8 +2,8 @@ from libsaas import http, parsers
 from libsaas.services import base
 
 from . import resource
-from . import downloads, forks, issues, keys, labels, milestones, repocommits
-from . import repocontents, pullrequests
+from . import downloads, forks, issues, keys, labels, milestones, releases, repocommits
+from . import repocontents, pullrequests, hooks
 
 
 class Repos(resource.GitHubResource):
@@ -241,9 +241,23 @@ class Repo(resource.GitHubResource):
     @base.resource(downloads.Downloads)
     def downloads(self):
         """
-        Return a resource corresponding to all commits from this repo.
+        Return a resource corresponding to all downloads from this repo.
         """
         return downloads.Downloads(self)
+
+    @base.resource(releases.Release)
+    def release(self, release_id):
+        """
+        Return a resource corresponding to a single release in this repo.
+        """
+        return releases.Release(self, release_id)
+
+    @base.resource(releases.Releases)
+    def releases(self):
+        """
+        Return a resource corresponding to all releases from this repo.
+        """
+        return releases.Releases(self)
 
     @base.resource(forks.Forks)
     def forks(self):
@@ -265,3 +279,17 @@ class Repo(resource.GitHubResource):
         Return a resource corresponding to all SSH keys of this repo.
         """
         return keys.RepoKeys(self)
+
+    @base.resource(hooks.RepoHook)
+    def hook(self, hook_id):
+        """
+        Return a resource corresponding to a single hook in this repo.
+        """
+        return hooks.RepoHook(self, hook_id)
+
+    @base.resource(hooks.RepoHooks)
+    def hooks(self):
+        """
+        Return a resource corresponding to all hooks of this repo.
+        """
+        return hooks.RepoHooks(self)

@@ -4,13 +4,13 @@ from libsaas import http
 from libsaas.filters import auth
 from libsaas.services import base
 
-from . import authorizations, gists, issues, repos, users
+from . import authorizations, gists, issues, organizations, repos, teams, users
 
 
 class GitHub(base.Resource):
     """
     """
-    def __init__(self, token_or_username, password=None):
+    def __init__(self, token_or_username, password=None, apiroot='https://api.github.com'):
         """
         Create a GitHub service.
 
@@ -21,8 +21,11 @@ class GitHub(base.Resource):
         :var password: Only used with the Basic authentication, leave this as
             `None` when using OAuth.
         :vartype password: str
+
+        :var apiroot: Only used for GitHub Enterprise, defaults to GitHub api url
+        :vartype apiroot: str
         """
-        self.apiroot = 'https://api.github.com'
+        self.apiroot = apiroot
 
         self.add_filter(self.use_json)
 
@@ -80,6 +83,13 @@ class GitHub(base.Resource):
         """
         return issues.Issues(self)
 
+    @base.resource(organizations.Organizations)
+    def org(self, org):
+        """
+        Return the resource corresponding to a single organization.
+        """
+        return organizations.Organizations(self, org)
+
     @base.resource(repos.Repo)
     def repo(self, user, repo):
         """
@@ -93,6 +103,13 @@ class GitHub(base.Resource):
         Return the resource corresponding to all the repos.
         """
         return repos.Repos(self)
+
+    @base.resource(teams.Team)
+    def team(self, team):
+        """
+        Return the resource corresponding to a single team.
+        """
+        return teams.Team(self, team)
 
     @base.resource(users.User, users.CurrentUser)
     def user(self, name=None):
